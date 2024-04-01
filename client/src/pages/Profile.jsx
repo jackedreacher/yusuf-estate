@@ -208,12 +208,9 @@ const Profile = () => {
           Create listing
         </Link>
       </form>
-      <p className="text-red-700 mt-5">{error ? error : ""}</p>
-      <p className="text-green-700 mt-2">
-        {updateSuccess ? "Profile updated successfuly!" : ""}
-      </p>
 
       {/* Delete and Sign out links */}
+      
       <div className="flex justify-between mt-5 ">
         <span
           onClick={handleDeleteUser}
@@ -225,6 +222,10 @@ const Profile = () => {
           Sign out
         </span>
       </div>
+      <p className="text-red-700 mt-5">{error ? error : ""}</p>
+      <p className="text-green-700 mt-2">
+        {updateSuccess ? "Profile updated successfuly!" : ""}
+      </p>
     </div>
   );
 };
