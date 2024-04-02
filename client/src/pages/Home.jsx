@@ -52,7 +52,7 @@ export default function Home() {
         <h1 className='text-slate-700 font-bold text-3xl lg:text-6xl'>
           Hayalini kurduğunuz <span className='text-slate-500'>mükemmel</span>
           <br />
-          evi rahatlıkla bulamaya ne dersiniz!
+          evi rahatlıkla bulamaya ne dersiniz?
         </h1>
         <div className='text-gray-400 text-xs sm:text-sm'>
         YusufEmlak birsonraki mükemmel evinizi bulmanız için şimdiye kadar kurulmuş en iyi emlakçılık sitesi.
@@ -117,7 +117,7 @@ export default function Home() {
         {saleListings && saleListings.length > 0 && (
           <div className=''>
             <div className='my-3'>
-              <h2 className='text-2xl font-semibold text-slate-600'>Son yayınlanan kiralık yerler</h2>
+              <h2 className='text-2xl font-semibold text-slate-600'>Son yayınlanan satılık yerler</h2>
               <Link className='text-sm text-blue-800 hover:underline' to={'/search?type=sale'}>Satılık daha fazla yer göster</Link>
             </div>
             <div className='flex flex-wrap gap-4'>

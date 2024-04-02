@@ -12,15 +12,15 @@ export const createListing = async (req, res, next) => {
 
 export const deleteListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
-  if (!listing) return next(errorHandler(404, "Listing not found!"));
+  if (!listing) return next(errorHandler(404, "İlan bulunamadı!"));
 
   if (req.user.id !== listing.userRef) {
-    return next(errorHandler(404, "You can only delete your listings!"));
+    return next(errorHandler(404, "Sadece kendi ilanını silebilirsin!"));
   }
 
   try {
     await Listing.findByIdAndDelete(req.params.id);
-    res.status(200).json("Deleted successfully!");
+    res.status(200).json("Başarıyla silindi!");
   } catch (error) {
     next(error);
   }
@@ -28,10 +28,10 @@ export const deleteListing = async (req, res, next) => {
 
 export const updateListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
-  if (!listing) return next(errorHandler(404, "Listing not found"));
+  if (!listing) return next(errorHandler(404, "İlan bulunamadı!"));
 
   if (req.user.id !== listing.userRef) {
-    return next(errorHandler(403, "You can only update your own listings"));
+    return next(errorHandler(403, "Sadece kendi ilanını güncelleyebilirsin"));
   }
 
   try {
@@ -49,7 +49,7 @@ export const updateListing = async (req, res, next) => {
 export const getListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
-    if (!listing) return next(errorHandler(404, "Listing not found!"));
+    if (!listing) return next(errorHandler(404, "İlan bulunamadı!"));
 
     res.status(200).json(listing);
   } catch (error) {

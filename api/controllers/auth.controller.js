@@ -20,7 +20,7 @@ export const singin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
-    if (!validUser) return next(errorHandler(400, "User  not found"));
+    if (!validUser) return next(errorHandler(400, "Kullanıcı bulunamadı!"));
 
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) return next(errorHandler(401, "Invalid credentials"));
@@ -77,7 +77,7 @@ export const google = async (req, res, next) => {
 export const signOut = async (req, res, next ) => {
   try {
     res.clearCookie("access_token");
-    res.status(200).json({ message: "User has been  signed out" });
+    res.status(200).json({ message: "Kullanıcının oturumu kapatıldı" });
   } catch (error) {
     
   }

@@ -9,7 +9,7 @@ export const test = (req, res) => {
 
 export const updateUser = async (req, res, next) => {
   if (req.user.id !== req.params.id)
-    return next(errorHandler(401, "You can only edit your account"));
+    return next(errorHandler(401, "Sadece kendi hesabını silebilirsin"));
   try {
     if (req.body.password) {
       req.body.password = bcrypt.hashSync(req.body.password, 10);
@@ -37,11 +37,11 @@ export const updateUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   if (req.user.id !== req.params.id)
-    return next(errorHandler(403, "You can only delete your own account!"));
+    return next(errorHandler(403, "Erişim yok!"));
   try {
     await User.findByIdAndDelete(req.params.id);
     res.clearCookie("access_token");
-    res.status(200).json("User has been deleted...");
+    res.status(200).json("Kullanıcı silindi...");
   } catch (error) {
     next(error);
   }
@@ -56,14 +56,14 @@ export const getUserListings = async (req, res, next) => {
       next(error);
     }
   } else {
-    return next(errorHandler(401, "Unauthorized"));
+    return next(errorHandler(401, "Yetkisiz"));
   }
 };
 
 export const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return next(errorHandler(400, "No user found!"));
+    if (!user) return next(errorHandler(400, "Kullanıcı bulunamadı!"));
 
     const { password: pass, ...rest } = user._doc;
     res.status(200).json(rest);
