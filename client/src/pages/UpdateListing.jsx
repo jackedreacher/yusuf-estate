@@ -1,17 +1,15 @@
+import { useEffect, useState } from "react";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import React, { useState } from "react";
 import { app } from "../firebase.js";
-import { set } from "mongoose";
-
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreateListing = () => {
+const UpdateListing = () => {
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -32,10 +30,30 @@ const CreateListing = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const {currentUser} = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const params = useParams();  
 
-  console.log(formData);
+
+
+
+  useEffect(() => {
+    const fetchListing = async () => {
+        const listingId = params.listingId;
+        const res = await fetch(`/api/listing/get/${listingId}`);
+        const data = await res.json();
+
+        if (data.success === false) {
+            console.log(data.message);
+            return;
+        }
+        setFormData(data);
+    };
+
+    fetchListing();
+
+  }, []);
+
 
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -47,22 +65,20 @@ const CreateListing = () => {
         promises.push(storeImage(files[i]));
       }
       Promise.all(promises)
-        .then((url) => {
+        .then((urls) => {
           setFormData({
             ...formData,
-            imageUrls: formData.imageUrls.concat(url),
+            imageUrls: formData.imageUrls.concat(urls),
           });
           setImageUploadError(false);
           setUploading(false);
         })
         .catch((err) => {
-          setImageUploadError(
-            "An error occurred while uploading your images. (2 mb max per image)"
-          );
+          setImageUploadError("Image upload failed. (2 mb max per image)");
           setUploading(false);
         });
     } else {
-      setImageUploadError("You can only add up to 6 images.");
+      setImageUploadError("You can only upload 6 images per listing");
       setUploading(false);
     }
   };
@@ -79,7 +95,7 @@ const CreateListing = () => {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress} % done`);
+          console.log(`Upload is ${progress}% done`);
         },
         (error) => {
           reject(error);
@@ -107,6 +123,7 @@ const CreateListing = () => {
         type: e.target.id,
       });
     }
+
     if (
       e.target.id === "parking" ||
       e.target.id === "furnished" ||
@@ -117,9 +134,10 @@ const CreateListing = () => {
         [e.target.id]: e.target.checked,
       });
     }
+
     if (
-      e.target.type === "number" ||
-      e.target.type === "text" ||
+      e.target.type == "number" ||
+      e.target.type == "text" ||
       e.target.type == "textarea"
     ) {
       setFormData({
@@ -133,15 +151,15 @@ const CreateListing = () => {
     e.preventDefault();
     try {
       if (formData.imageUrls.length < 1)
-        return setError("Lütfen an az bir resim ekleyin");
+        return setError("You must upload at least one image");
 
-      if (formData.regularPrice < +formData.discountPrice)
-        return setError("İndirimli fiyat normal fiyatın altında olmalıdır.");
+      if (+formData.regularPrice < +formData.discountPrice)
+        return setError("Discount price cannot be higher than regular price");
 
       setLoading(true);
-      setError(true);
+      setError(false);
 
-      const res = await fetch("/api/listing/create", {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -167,15 +185,15 @@ const CreateListing = () => {
   };
 
   return (
-    <main className="p-3  max-w-4xl  mx-auto">
+    <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
-        İlan Oluştur
+        İlanı Güncelle
       </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-6">
         <div className="flex flex-col gap-4 flex-1">
           <input
             type="text"
-            placeholder="İlan ismi"
+            placeholder="İsim"
             className="border p-3 rounded-lg"
             id="name"
             maxLength="62"
@@ -186,7 +204,7 @@ const CreateListing = () => {
           />
           <textarea
             type="text"
-            placeholder="Açıklama"
+            placeholder="Tanım"
             className="border p-3 rounded-lg"
             id="description"
             required
@@ -202,6 +220,7 @@ const CreateListing = () => {
             onChange={handleChange}
             value={formData.address}
           />
+
           <div className="flex gap-6 flex-wrap">
             <div className="flex gap-2">
               <input
@@ -294,39 +313,37 @@ const CreateListing = () => {
                 value={formData.regularPrice}
               />
               <div className="flex flex-col items-center">
-                <p>Normal Fiyatı</p>
+                <p>Normal fiyatı</p>
               </div>
             </div>
             {formData.offer && (
-
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountPrice"
-                min="0"
-                max="10000000"
-                required
-                className="p-3 border border-gray-300 rounded-lg"
-                onChange={handleChange}
-                value={formData.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>İndirimli Fiyatı</p>
-                {formData.type === "rent" && (
-                  <span className="text-xs">(₺ / aylık)</span>
-                ) }
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min="0"
+                  max="10000000"
+                  required
+                  className="p-3 border border-gray-300 rounded-lg"
+                  onChange={handleChange}
+                  value={formData.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>İndirimli Fiyatı</p>
+                  {formData.type === "rent" && (
+                    <span className="text-xs">(₺ / Aylık)</span>
+                  )}
+                </div>
               </div>
-            </div>
             )}
-
           </div>
         </div>
 
         <div className="flex flex-col flex-1 gap-4">
           <p className="font-semibold">
-            Images:
+            Resimler:
             <span className="font-normal text-gray-600 ml-2">
-              İlk görsel kapak resmi olacaktır (en fazla 6 adet)
+            İlk görsel kapak görseli olacaktır (en fazla 6 adete kadar)
             </span>
           </p>
           <div className="flex gap-4">
@@ -344,7 +361,7 @@ const CreateListing = () => {
               type="button"
               className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
             >
-              {uploading ? "Yükleniyor..." : "Yükle"}
+              {uploading ? "Yükleniyor..." : "Ekle"}
             </button>
           </div>
           <p className="text-red-700 text-sm">
@@ -354,33 +371,31 @@ const CreateListing = () => {
             formData.imageUrls.map((url, index) => (
               <div
                 key={url}
-                alt="listing image"
                 className="flex justify-between p-3 border items-center"
               >
                 <img
                   src={url}
-                  alt=""
-                  width="listing image"
-                  className="w-20 h-20 object-obtain rounded-lg"
+                  alt="listing image"
+                  className="w-20 h-20 object-contain rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(index)}
-                  className="p-3  text-red-700 rounded-lg  hover:opacity-75"
+                  className="p-3 text-red-700 rounded-lg  hover:opacity-75"
                 >
                   Sil
                 </button>
               </div>
             ))}
-
-          <button disabled={loading || uploading} className="p-3 bg-slate-700 text-white rounded-lg  hover:opacity-95 disabled:opacity-80">
-            {loading ? "Oluşturuluyor..." : "İlanı Oluştur"}
+          ;
+          <button disabled={loading || uploading} className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+            {loading ? "Güncelleniyor..." : "İlanı Güncelle"}
           </button>
-           {error && <p className="text-red-700 text-sms">{error}</p> }
+          {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
     </main>
   );
 };
-export default CreateListing;
-5;
+
+export default UpdateListing;

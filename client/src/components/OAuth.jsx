@@ -30,7 +30,7 @@ const OAuth = () => {
       dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
-      console.log("Could not sign in with Google", error);
+      console.log(" Google ile giriş yapılamadı", error);
     }
   };
 
@@ -38,9 +38,9 @@ const OAuth = () => {
     <button
       onClick={handleGoogleClick}
       type="button"
-      className="bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-95"
+      className="bg-red-700 text-white p-3 rounded-lg  hover:opacity-95"
     >
-      Continue with Google
+      Google ile devam et
     </button>
   );
 };

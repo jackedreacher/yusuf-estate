@@ -1,4 +1,4 @@
-import mongoose, { trusted } from "mongoose";
+import mongoose from "mongoose";
 
 const listingSchema = new mongoose.Schema(
   {
@@ -26,7 +26,15 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    bathrooms: {
+      type: Number,
+      required: true,
+    },
     furnished: {
+      type: Boolean,
+      required: true,
+    },
+    parking: {
       type: Boolean,
       required: true,
     },

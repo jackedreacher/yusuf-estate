@@ -47,7 +47,7 @@ const SignIn = () => {
   };
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
+      <h1 className="text-3xl text-center font-semibold my-7">Giriş yap</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
@@ -58,20 +58,20 @@ const SignIn = () => {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="şifre"
           className="border p-3 rounded-lg"
           id="password"
           onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-70">
-          {loading ? "Please wait..." : "Sign in"}
+        <button className="bg-slate-700 text-white p-3 rounded-lg  hover:opacity-95 disabled:opacity-70">
+          {loading ? "Lütfen bekleyiniz..." : "Giriş yap"}
         </button>
         <OAuth/>
       </form>
       <div className="flex gap-2 mt-5 ">
-        <p>Dont have an account?</p>
+        <p>Hesabın yok  mu?</p>
         <Link to="/sign-up">
-          <span className="text-blue-700">Sign up</span>
+          <span className="text-blue-700">Hesap Oluştur</span>
         </Link>
       </div>
       {error && <p className="text-red-500 m">{error}</p>}
